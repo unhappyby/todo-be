@@ -33,6 +33,11 @@ var TaskModel = mongoose.model("Task", taskSchema);
 module.exports = function(app) {
 
 app.get('/tasks', function(request, response) {
+  if (Math.random() > 0.7) {
+    response.json({error: "Something whent wrong!!! Server will explode in few minutes for sure -_- "})
+    return;
+  }
+
   TaskModel.find({}, {__v: 0},  {sort: {order: "asc"}}, function(error, data) {
     if(error) throw error
 
