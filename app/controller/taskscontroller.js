@@ -12,8 +12,8 @@ const Status = Object.freeze({
 var taskSchema = new mongoose.Schema({
   name: String,
   status: { type: String, default: Status.ACTIVE },
-  priority: Boolean,
-  order: Number
+  priority: { type: Boolean, default: false },
+  order: { type: Number, default: 1 }
 });
 
 taskSchema.virtual('id').get(function(){
@@ -38,7 +38,7 @@ app.get('/tasks', function(request, response) {
     return;
   }
 
-  TaskModel.find({}, {__v: 0},  {sort: {order: "asc"}}, function(error, data) {
+  TaskModel.find({}, {__v: 0}, {sort: {priority: "desc", order: "asc"}}, function(error, data) {
     if(error) throw error
 
     response.json({tasks: data});
@@ -48,11 +48,42 @@ app.get('/tasks', function(request, response) {
 app.post('/tasks', function(request, response) {
   console.log(request.body)
 
+  if (request.body.name == null || request.body.name.trim() == "") {
+    response.send('Task name cannot be empty!')
+    return;
+  }
+
   TaskModel(request.body).save(function(error, data) {
     if(error) throw error
 
     response.json(data);
   });
+});
+
+app.post('/tasks/:id', async function(request, response) {
+  console.log(request.body)
+  
+  let update = {};
+
+  if (request.body.name != null) {
+    update['name'] = request.body.name;
+  }
+  if (request.body.status != null) {
+    update['status'] = request.body.status;
+  }
+  if (request.body.priority != null) {
+    update['priority'] = request.body.priority;
+  }
+  if (request.body.order != null) {
+    update['order'] = request.body.order;
+  }
+
+  let task = await TaskModel.findOneAndUpdate({_id: request.params.id}, update, {
+    returnOriginal: false,
+    useFindAndModify: false
+  });
+
+  response.json(task);
 });
 
 app.delete('/tasks/:id', function(request, response) {
