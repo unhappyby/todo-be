@@ -5,6 +5,10 @@ var taskscontroller = require('./app/controller/taskscontroller.js');
 var express = require('express');
 var app = express();
 app.use(express.json());
+app.use(function(req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', '*')
+    next();
+  });
 
 const PORT = process.env.NODE_DOCKER_PORT || process.env.PORT;
 
