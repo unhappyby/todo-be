@@ -34,7 +34,7 @@ module.exports = function(app) {
 
 app.get('/tasks', function(request, response) {
   if (Math.random() > 0.7) {
-    res.status(500).json({status: 500, message: "Something went wrong!!! Server will explode in few minutes for sure -_- "})
+    response.status(500).json({status: 500, message: "Something went wrong!!! Server will explode in few minutes for sure -_- "})
     return;
   }
 
